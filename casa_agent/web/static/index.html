@@ -67,6 +67,8 @@
   .survey th, .survey td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; }
   .survey a { color: var(--accent); }
   .failed { color: var(--warn); font-size: 12px; margin-bottom: 12px; }
+  .demo-note { font-size: 11px; color: var(--warn); }
+  .open { font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none; }
 </style>
 </head>
 <body>
@@ -192,6 +194,8 @@
       <div class="stat"><b>${res.matching}</b>match your criteria</div>
       <div class="stat"><b>${res.sources_queried.length}</b>sources</div></div>`;
     if (failed) html += `<div class="failed">Some sources failed — ${esc(failed)}</div>`;
+    if (res.options.length && res.options.every(o => o.listing.source.startsWith('demo')))
+      html += `<div class="failed">Showing demo data: no real portal returned listings. Check CASA_SOURCES in .env and the errors above.</div>`;
     html += '<div class="cards">' + res.options.map((o, i) => {
       const l = o.listing;
       const vs = l.price_vs_zone_pct == null ? '' :
@@ -199,6 +203,7 @@
       const b = o.score_breakdown || {};
       return `<div class="card">
         <div class="top"><h3>#${i + 1} <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a></h3><div class="score">${o.score}</div></div>
+        ${l.source.startsWith('demo') ? '<div class="demo-note">Demo listing (synthetic) — link opens the portal\'s real search for this zone</div>' : `<a class="open" href="${esc(l.url)}" target="_blank" rel="noopener">Open listing on ${esc(l.source)} ↗</a>`}
         <div class="price">€${fmt(l.price)}${rent ? '/mo' : ''} ${l.price_per_m2 ? `<span class="facts">· €${fmt(l.price_per_m2)}/m²</span>` : ''} ${vs}</div>
         <div class="facts">${l.bedrooms} bd · ${l.bathrooms} ba · ${Math.round(l.size_m2)} m² · ${esc(l.district || l.neighborhood)}${l.neighborhood && l.district ? ' (' + esc(l.neighborhood) + ')' : ''}${l.floor != null ? ' · floor ' + l.floor : ''}</div>
         <div class="facts">${esc(l.source)}${l.also_on?.length ? ' + ' + l.also_on.map(esc).join(', ') : ''}${l.days_on_market != null ? ' · ' + l.days_on_market + ' days listed' : ''}</div>

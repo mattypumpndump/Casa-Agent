@@ -316,6 +316,10 @@ def score(l: Listing, p: SearchParams) -> ScoredListing:
 async def run_search(params: SearchParams, sources: list[Source], top_n: int | None = None) -> SearchResult:
     top_n = top_n or config.TOP_N
     raw, failed = await fetch_all(sources, params)
+    # Demo data is a fallback: if any real source returned listings, drop the synthetic ones
+    real = [l for l in raw if not l.source.startswith("demo")]
+    if real:
+        raw = real
     universe = dedup(raw)
     matching = hard_filter(universe, params)
     matching = enrich(matching, universe)

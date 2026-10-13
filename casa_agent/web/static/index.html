@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Casa Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<style>
+  :root {
+    --bg: #f6f3ee; --panel: #ffffff; --ink: #1d1b19; --muted: #6b6560; --line: #e6e0d8;
+    --accent: #b5451b; --accent-soft: #fbe9e1; --good: #2f7a4f; --warn: #a36a00; --bad: #a33a2a;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161412; --panel: #1f1c19; --ink: #efe9e2; --muted: #a29a91; --line: #332e29;
+      --accent: #e0683a; --accent-soft: #3a2218; --good: #6cc48f; --warn: #e2b04a; --bad: #e27a6a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 Inter, system-ui, sans-serif; }
+  h1, h2, h3 { font-family: Fraunces, Georgia, serif; }
+  header { display: flex; align-items: baseline; gap: 14px; padding: 18px 24px 10px; }
+  header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+  header span { color: var(--muted); font-size: 13px; }
+  #status { margin-left: auto; font-size: 12px; color: var(--muted); }
+  main { display: grid; grid-template-columns: 380px 1fr; gap: 16px; padding: 0 16px 16px; height: calc(100vh - 64px); }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; height: auto; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; min-height: 0; }
+  #chat { padding: 16px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .msg { padding: 10px 14px; border-radius: 12px; max-width: 92%; white-space: pre-wrap; }
+  .msg.user { align-self: flex-end; background: var(--accent); color: #fff; }
+  .msg.bot { align-self: flex-start; background: var(--bg); }
+  .msg.bot.thinking { color: var(--muted); font-style: italic; }
+  form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+  textarea { flex: 1; resize: none; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; background: var(--bg); color: var(--ink); height: 64px; }
+  button { border: 0; background: var(--accent); color: #fff; border-radius: 10px; padding: 0 18px; font: inherit; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
+  .chip { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; border: 0; font-weight: 500; }
+  #results { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  #results.empty { display: flex; align-items: center; justify-content: center; color: var(--muted); text-align: center; }
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .stat { background: var(--bg); border-radius: 10px; padding: 8px 12px; font-size: 13px; }
+  .stat b { display: block; font-size: 18px; font-family: Fraunces, serif; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .card .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .card h3 { margin: 0; font-size: 15px; line-height: 1.25; }
+  .card h3 a { color: inherit; text-decoration: none; }
+  .score { font-family: Fraunces, serif; font-size: 22px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .price { font-weight: 600; font-size: 17px; }
+  .facts { color: var(--muted); font-size: 13px; }
+  .vs { font-size: 12px; font-weight: 600; }
+  .vs.good { color: var(--good); } .vs.bad { color: var(--bad); }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--bg); }
+  .tag.pro { color: var(--good); } .tag.con { color: var(--bad); } .tag.flag { color: var(--warn); }
+  .bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 4px; }
+  .bar { height: 4px; background: var(--line); border-radius: 2px; position: relative; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 2px; }
+  .bar-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .survey { border-top: 1px solid var(--line); padding-top: 16px; max-width: 80ch; }
+  .survey table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 12px 0; }
+  .survey th, .survey td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; }
+  .survey a { color: var(--accent); }
+  .failed { color: var(--warn); font-size: 12px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Casa Agent</h1>
+  <span>Multi-portal housing search · comparison · survey</span>
+  <span id="status">…</span>
+</header>
+<main>
+  <section class="panel">
+    <div id="chat">
+      <div class="msg bot">Tell me what you're looking for — rent or buy, budget, zones, how many of you, must-haves. I'll search every portal, remove duplicates, score the options and write you a survey. Then refine it: "cheaper", "add Retiro", "I can drop the terrace".</div>
+    </div>
+    <div class="chips">
+      <button class="chip">We're a couple renting in Malasaña or Chamberí, max 1600/month, need a terrace</button>
+      <button class="chip">Family of 4 buying in Retiro or Chamartín, budget 650k, 3 bedrooms, parking</button>
+      <button class="chip">Student, studio to rent anywhere central under 950, furnished</button>
+    </div>
+    <form id="form">
+      <textarea id="input" placeholder="Describe what you need…" required></textarea>
+      <button id="send" type="submit">Search</button>
+    </form>
+  </section>
+  <section class="panel">
+    <div id="results" class="empty">Your ranked options and survey will appear here.</div>
+  </section>
+</main>
+<script>
+  let sessionId = null;
+  const chat = document.getElementById('chat');
+  const results = document.getElementById('results');
+  const input = document.getElementById('input');
+  const send = document.getElementById('send');
+
+  fetch('/api/health').then(r => r.json()).then(h => {
+    document.getElementById('status').textContent =
+      (h.llm ? 'LLM: on' : 'LLM: off (rule-based)') + ' · sources: ' + h.sources.join(', ');
+  }).catch(() => {});
+
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { input.value = c.textContent; input.focus(); }));
+  input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('form').requestSubmit(); } });
+
+  document.getElementById('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    addMsg(text, 'user');
+    input.value = '';
+    send.disabled = true;
+    const thinking = addMsg('Searching portals, deduplicating, scoring…', 'bot thinking');
+    try {
+      const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, message: text }) });
+      if (!r.ok) throw new Error(await r.text());
+      const data = await r.json();
+      sessionId = data.session_id;
+      thinking.remove();
+      const res = data.result;
+      addMsg(`Searched: ${summarize(res.params)}\n${res.total_found} listings → ${res.after_dedup} unique → ${res.matching} match. Showing top ${res.options.length}.`, 'bot');
+      render(res);
+    } catch (err) {
+      thinking.textContent = 'Something went wrong: ' + err.message;
+      thinking.classList.remove('thinking');
+    } finally { send.disabled = false; }
+  });
+
+  function addMsg(text, cls) {
+    const d = document.createElement('div');
+    d.className = 'msg ' + cls; d.textContent = text;
+    chat.appendChild(d); chat.scrollTop = chat.scrollHeight; return d;
+  }
+  function summarize(p) {
+    const bits = [p.operation + ' in ' + p.city];
+    if (p.districts?.length) bits.push(p.districts.join('/'));
+    if (p.max_price) bits.push('≤ €' + fmt(p.max_price));
+    if (p.min_bedrooms) bits.push('≥' + p.min_bedrooms + ' bd');
+    if (p.min_size_m2) bits.push('≥' + p.min_size_m2 + ' m²');
+    bits.push(p.household_size + ' people');
+    return bits.join(' · ');
+  }
+  const fmt = n => Math.round(n).toLocaleString('en');
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  // Use marked if the CDN loaded; otherwise a small built-in Markdown renderer.
+  function renderMd(md) {
+    if (window.marked) { try { return marked.parse(md); } catch (e) {} }
+    const inline = s => esc(s)
+      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+    const lines = md.split('\n'); let out = '', i = 0;
+    while (i < lines.length) {
+      const L = lines[i];
+      if (/^\s*$/.test(L)) { i++; continue; }
+      let m;
+      if ((m = L.match(/^(#{1,6})\s+(.*)/))) { out += `<h${m[1].length + 1}>${inline(m[2])}</h${m[1].length + 1}>`; i++; continue; }
+      if (/^\|/.test(L)) {
+        const rows = []; while (i < lines.length && /^\|/.test(lines[i])) rows.push(lines[i++]);
+        const cells = r => r.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+        const body = rows.filter(r => !/^\|\s*-/.test(r));
+        out += '<table>' + body.map((r, k) => '<tr>' + cells(r).map(c => `<${k ? 'td' : 'th'}>${inline(c)}</${k ? 'td' : 'th'}>`).join('') + '</tr>').join('') + '</table>';
+        continue;
+      }
+      if (/^\s*([-*]|\d+\.)\s+/.test(L)) {
+        const ol = /^\s*\d+\./.test(L); const items = [];
+        while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])) items.push(lines[i++].replace(/^\s*([-*]|\d+\.)\s+/, ''));
+        out += `<${ol ? 'ol' : 'ul'}>` + items.map(x => `<li>${inline(x)}</li>`).join('') + `</${ol ? 'ol' : 'ul'}>`;
+        continue;
+      }
+      const para = []; while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^(#|\||\s*[-*]\s|\s*\d+\.\s)/.test(lines[i])) para.push(lines[i++]);
+      out += '<p>' + para.map(inline).join('<br>') + '</p>';
+    }
+    return out;
+  }
+
+  function render(res) {
+    results.classList.remove('empty');
+    const rent = res.params.operation === 'rent';
+    const failed = Object.entries(res.sources_failed || {}).map(([k, v]) => `${k}: ${v}`).join(' · ');
+    let html = `<div class="stats">
+      <div class="stat"><b>${res.total_found}</b>listings found</div>
+      <div class="stat"><b>${res.after_dedup}</b>unique properties</div>
+      <div class="stat"><b>${res.matching}</b>match your criteria</div>
+      <div class="stat"><b>${res.sources_queried.length}</b>sources</div></div>`;
+    if (failed) html += `<div class="failed">Some sources failed — ${esc(failed)}</div>`;
+    html += '<div class="cards">' + res.options.map((o, i) => {
+      const l = o.listing;
+      const vs = l.price_vs_zone_pct == null ? '' :
+        `<span class="vs ${l.price_vs_zone_pct <= -5 ? 'good' : l.price_vs_zone_pct >= 10 ? 'bad' : ''}">${l.price_vs_zone_pct > 0 ? '+' : ''}${l.price_vs_zone_pct}% vs zone</span>`;
+      const b = o.score_breakdown || {};
+      return `<div class="card">
+        <div class="top"><h3>#${i + 1} <a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.title)}</a></h3><div class="score">${o.score}</div></div>
+        <div class="price">€${fmt(l.price)}${rent ? '/mo' : ''} ${l.price_per_m2 ? `<span class="facts">· €${fmt(l.price_per_m2)}/m²</span>` : ''} ${vs}</div>
+        <div class="facts">${l.bedrooms} bd · ${l.bathrooms} ba · ${Math.round(l.size_m2)} m² · ${esc(l.district || l.neighborhood)}${l.neighborhood && l.district ? ' (' + esc(l.neighborhood) + ')' : ''}${l.floor != null ? ' · floor ' + l.floor : ''}</div>
+        <div class="facts">${esc(l.source)}${l.also_on?.length ? ' + ' + l.also_on.map(esc).join(', ') : ''}${l.days_on_market != null ? ' · ' + l.days_on_market + ' days listed' : ''}</div>
+        <div class="tags">${o.pros.map(p => `<span class="tag pro">+ ${esc(p)}</span>`).join('')}${o.cons.map(c => `<span class="tag con">− ${esc(c)}</span>`).join('')}${o.flags.map(f => `<span class="tag flag">! ${esc(f)}</span>`).join('')}</div>
+        <div class="bars">${['price','size','location','amenities'].map(k => `<div><div class="bar-label">${k}</div><div class="bar"><i style="width:${b[k] ?? 0}%"></i></div></div>`).join('')}</div>
+      </div>`;
+    }).join('') + '</div>';
+    html += '<div class="survey">' + renderMd(res.survey || '') + '</div>';
+    results.innerHTML = html;
+    results.scrollTop = 0;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+{
+  "city": "Madrid",
+  "updated": "2026-10",
+  "note": "Approximate asking-price benchmarks used by the demo source and as a sanity check for scraped prices. Update from portal reports.",
+  "districts": {
+    "Centro": {
+      "neighborhoods": [
+        "Malasaña",
+        "Chueca",
+        "Lavapiés",
+        "Sol",
+        "Palacio"
+      ],
+      "rent_eur_m2_month": 24,
+      "sale_eur_m2": 6200
+    },
+    "Salamanca": {
+      "neighborhoods": [
+        "Goya",
+        "Recoletos",
+        "Lista",
+        "Castellana"
+      ],
+      "rent_eur_m2_month": 27,
+      "sale_eur_m2": 8500
+    },
+    "Chamberí": {
+      "neighborhoods": [
+        "Trafalgar",
+        "Almagro",
+        "Arapiles",
+        "Gaztambide"
+      ],
+      "rent_eur_m2_month": 25,
+      "sale_eur_m2": 7300
+    },
+    "Retiro": {
+      "neighborhoods": [
+        "Ibiza",
+        "Niño Jesús",
+        "Pacífico",
+        "Jerónimos"
+      ],
+      "rent_eur_m2_month": 22,
+      "sale_eur_m2": 6300
+    },
+    "Chamartín": {
+      "neighborhoods": [
+        "Hispanoamérica",
+        "Nueva España",
+        "Prosperidad",
+        "El Viso"
+      ],
+      "rent_eur_m2_month": 23,
+      "sale_eur_m2": 6900
+    },
+    "Tetuán": {
+      "neighborhoods": [
+        "Cuatro Caminos",
+        "Bellas Vistas",
+        "Valdeacederas",
+        "Berruguete"
+      ],
+      "rent_eur_m2_month": 19,
+      "sale_eur_m2": 4600
+    },
+    "Arganzuela": {
+      "neighborhoods": [
+        "Delicias",
+        "Legazpi",
+        "Imperial",
+        "Acacias"
+      ],
+      "rent_eur_m2_month": 20,
+      "sale_eur_m2": 5000
+    },
+    "Moncloa-Aravaca": {
+      "neighborhoods": [
+        "Argüelles",
+        "Aravaca",
+        "Ciudad Universitaria",
+        "Valdezarza"
+      ],
+      "rent_eur_m2_month": 21,
+      "sale_eur_m2": 5500
+    },
+    "Carabanchel": {
+      "neighborhoods": [
+        "Vista Alegre",
+        "Opañel",
+        "San Isidro",
+        "Puerta Bonita"
+      ],
+      "rent_eur_m2_month": 15,
+      "sale_eur_m2": 3100
+    },
+    "Latina": {
+      "neighborhoods": [
+        "Aluche",
+        "Lucero",
+        "Puerta del Ángel",
+        "Las Águilas"
+      ],
+      "rent_eur_m2_month": 15,
+      "sale_eur_m2": 3000
+    },
+    "Usera": {
+      "neighborhoods": [
+        "Moscardó",
+        "Orcasitas",
+        "Almendrales"
+      ],
+      "rent_eur_m2_month": 14,
+      "sale_eur_m2": 2800
+    },
+    "Puente de Vallecas": {
+      "neighborhoods": [
+        "Numancia",
+        "Portazgo",
+        "San Diego"
+      ],
+      "rent_eur_m2_month": 14,
+      "sale_eur_m2": 2600
+    },
+    "Hortaleza": {
+      "neighborhoods": [
+        "Canillas",
+        "Pinar del Rey",
+        "Sanchinarro"
+      ],
+      "rent_eur_m2_month": 18,
+      "sale_eur_m2": 4300
+    },
+    "Ciudad Lineal": {
+      "neighborhoods": [
+        "Pueblo Nuevo",
+        "Quintana",
+        "Concepción",
+        "Ventas"
+      ],
+      "rent_eur_m2_month": 17,
+      "sale_eur_m2": 3900
+    },
+    "Fuencarral-El Pardo": {
+      "neighborhoods": [
+        "Las Tablas",
+        "Mirasierra",
+        "Peñagrande"
+      ],
+      "rent_eur_m2_month": 18,
+      "sale_eur_m2": 4400
+    },
+    "Villaverde": {
+      "neighborhoods": [
+        "Villaverde Alto",
+        "San Cristóbal",
+        "Butarque"
+      ],
+      "rent_eur_m2_month": 12,
+      "sale_eur_m2": 2300
+    }
+  }
+}

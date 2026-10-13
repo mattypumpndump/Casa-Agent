@@ -134,8 +134,7 @@ def hard_filter(listings: list[Listing], p: SearchParams) -> list[Listing]:
     def ok(l: Listing) -> bool:
         if l.price <= 0:
             return False
-        if l.size_m2 <= 0 and l.property_type != PropertyType.ROOM:
-            return False
+        # size 0 means "not stated": keep it unless the user set a minimum size
         if p.max_price and l.price > p.max_price:
             return False
         if p.min_price and l.price < p.min_price:
@@ -228,15 +227,20 @@ def score(l: Listing, p: SearchParams) -> ScoredListing:
 
     # --- size & household fit
     people = max(1, p.household_size)
-    m2_pp = l.size_m2 / people
-    s_size = _clamp((m2_pp - 12) / 25)  # 12 m²/person → 0, 37 → 1
+    if l.size_m2 <= 0:
+        m2_pp = 0.0
+        s_size = 0.5  # unknown → neutral
+        flags.append("Size not stated in the listing — ask")
+    else:
+        m2_pp = l.size_m2 / people
+        s_size = _clamp((m2_pp - 12) / 25)  # 12 m²/person → 0, 37 → 1
     rooms_needed = max(1, math.ceil(people / 2)) if people > 1 else 0
     if l.bedrooms < rooms_needed:
         cons.append(f"Only {l.bedrooms} bedroom(s) for {people} people")
         s_size *= 0.6
     elif l.bedrooms >= rooms_needed + 1 and people > 1:
         pros.append("Spare room for office/guests")
-    if m2_pp < 18 and people > 1:
+    if 0 < m2_pp < 18 and people > 1:
         flags.append(f"Tight: ~{m2_pp:.0f} m² per person")
     if p.min_size_m2 and l.size_m2 >= p.min_size_m2 * 1.25:
         pros.append(f"Roomy: {l.size_m2:.0f} m²")

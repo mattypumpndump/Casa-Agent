@@ -59,8 +59,10 @@ class SpotahomeSource(Source):
         if price is None:
             return None
         beds = first_int(r"(\d+)-bedroom", text)
-        size = first_float(r"Size:\s*(\d+(?:[.,]\d+)?)\s*m", text) or 0.0
-        baths = first_int(r"Bathrooms?:\s*(\d+)", text) or 1
+        size = (first_float(r"Size:?\s*(\d+(?:[.,]\d+)?)\s*m", text)
+                or first_float(r"(\d+(?:[.,]\d+)?)\s*m²", text)
+                or first_float(r"(\d+(?:[.,]\d+)?)\s*m2\b", text) or 0.0)
+        baths = first_int(r"Bathrooms?:?\s*(\d+)", text) or first_int(r"(\d+)\s*bath", text) or 1
         hood = ""
         hm = re.search(r"\bin\s+([^,]+?),\s*" + re.escape(params.city), text, re.I)
         if hm:

@@ -7,3 +7,4 @@ agent_fs/PROJECTS/*
 !agent_fs/PROJECTS/.gitkeep
 agent_fs/MEMORY/sessions/*
 !agent_fs/MEMORY/sessions/.gitkeep
+debug/

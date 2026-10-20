@@ -4,12 +4,12 @@ The agent reads this before every search and updates it after.
 Edit by hand to seed preferences. Keep it short; session detail lives in MEMORY/sessions/.
 
 ## Standing preferences
-- operation: (unknown)
+- operation: rent
 - city: Madrid
-- household_size: (unknown)
+- household_size: 1
 - preferred_districts: (none yet)
-- must_haves: (none yet)
-- typical_budget: (unknown)
+- must_haves: furnished
+- typical_budget: €950/month
 
 ## Learned over time
 (empty — the agent appends dated notes here, e.g. "2026-10-13: dropped terrace requirement to fit budget")
